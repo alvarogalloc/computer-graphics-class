@@ -1,0 +1,6 @@
+[
+{
+  "directory": "/home/rooster/code/computer-graphics-class/02-img-creation",
+  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-std=c++26", "-I", "/home/rooster/vcpkg/installed/x64-linux/include", "-DNDEBUG", "-o", "build/.objs/02-img-creation/linux/x86_64/release/src/main.cpp.o", "src/main.cpp"],
+  "file": "src/main.cpp"
+}]
