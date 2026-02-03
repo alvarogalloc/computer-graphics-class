@@ -1,2 +1,7 @@
 .idea/
 out/
+target/
+.cache/
+.config/
+compile_commands.json
+
