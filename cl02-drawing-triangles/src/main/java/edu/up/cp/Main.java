@@ -1,17 +1,13 @@
 package edu.up.cp;
 
-/**
- * Main class for triangle rendering demonstration.
- * Creates various triangles with different colors and positions,
- * then saves the results as JPG images using BufferedImage and ImageIO.
- */
 public class Main {
     public static void main(String[] args) {
         try {
             Image image = new Image(500, 500);
             RenderData vertices = new RenderData();
             
-            // First small triangle with different colors at each vertex
+            // First two triangles in the screen reusing vertices
+            //
             vertices.addVertex(0, 0, Color.BLACK);
             vertices.addVertex(0, 50, Color.RED);
             vertices.addVertex(50, 50, Color.GREEN);

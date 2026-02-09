@@ -5,11 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * Image class that implements the Target interface using BufferedImage.
- * Provides functionality to create, manipulate, and save images as JPG files.
- * Uses standard Java AWT BufferedImage and ImageIO for image operations.
- */
 public class Image implements Target {
     private final BufferedImage bufferedImage;
 

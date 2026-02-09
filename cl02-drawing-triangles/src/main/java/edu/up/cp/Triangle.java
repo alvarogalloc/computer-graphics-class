@@ -1,10 +1,5 @@
 package edu.up.cp;
 
-/**
- * Triangle class for rendering filled triangles with interpolated colors.
- * Uses edge function and barycentric coordinates for rasterization.
- * Supports color interpolation across the triangle surface.
- */
 public class Triangle {
     private final int v1Id;
     private final int v2Id;
@@ -25,14 +20,11 @@ public class Triangle {
      * Edge function for determining which side of a line a point lies on.
      * Returns positive if point is on one side, negative on the other, zero on the line.
      */
+    // basically just a determinant, also called th signed area
     private static int edgeFunction(int x1, int y1, int x2, int y2, int x, int y) {
         return (y2 - y1) * (x - x1) - (x2 - x1) * (y - y1);
     }
 
-    /**
-     * Calculates barycentric coordinates for a point within a triangle.
-     * Returns weights (w1, w2, w3) that sum to 1 for points inside the triangle.
-     */
     private static float[] barycentric(int x1, int y1, int x2, int y2, int x3, int y3, int x, int y) {
         float denom = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
 
@@ -49,7 +41,7 @@ public class Triangle {
 
     /**
      * Interpolates color at a specific point using barycentric coordinates.
-     * Acts as a fragment shader to compute the final pixel color.
+     * its the amount of color given  a distance to the opposite side of the triangle
      */
     private Color interpolateColor(int x, int y) {
         int[] v1 = renderData.getVertex(v1Id);
@@ -74,8 +66,10 @@ public class Triangle {
     }
 
     /**
-     * Renders the triangle to the specified target using rasterization.
      * Fills the triangle with interpolated colors.
+     * i have to make this draw anything, a texture, a gradient, idk
+     * anything. this can be general with a Fragment shader 
+     * that is like (collection of vertices (point and color) and the current xy of the domain box (bounding))
      */
     public void render(Target target) {
         int[] v1 = renderData.getVertex(v1Id);
@@ -94,12 +88,10 @@ public class Triangle {
         int maxX = Math.max(v1[0], Math.max(v2[0], v3[0]));
         int maxY = Math.max(v1[1], Math.max(v2[1], v3[1]));
 
-        // Determine winding order for consistent inside/outside testing
         boolean v1v2InsideIsPositive = edgeFunction(v1[0], v1[1], v2[0], v2[1], v3[0], v3[1]) >= 0;
         boolean v2v3InsideIsPositive = edgeFunction(v2[0], v2[1], v3[0], v3[1], v1[0], v1[1]) >= 0;
         boolean v3v1InsideIsPositive = edgeFunction(v3[0], v3[1], v1[0], v1[1], v2[0], v2[1]) >= 0;
 
-        // Rasterize
         for (int y = minY; y <= maxY; y++) {
             for (int x = minX; x <= maxX; x++) {
                 // Test which side of each edge the point is on

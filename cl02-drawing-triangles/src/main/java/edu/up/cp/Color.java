@@ -1,10 +1,5 @@
 package edu.up.cp;
 
-/**
- * Color class for RGB color representation.
- * Provides basic color operations and predefined color constants.
- * Colors are stored as RGB values with 0-255 range for each component.
- */
 public class Color {
     private final int red;
     private final int green;
