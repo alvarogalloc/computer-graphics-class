@@ -18,7 +18,7 @@ class RenderData {
   auto assert_in_bounds(int vertex_id) {
     if (vertex_id >= color_buffer.size() || vertex_id < 0) {
       throw std::out_of_range{std::format(
-          "that vertex does not exist, max is {}", color_buffer.size())};
+          "that vertex does not exist, max is {}", color_buffer.size()-1)};
     }
   }
 

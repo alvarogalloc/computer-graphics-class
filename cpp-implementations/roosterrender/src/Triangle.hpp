@@ -4,13 +4,13 @@
 #include "Target.hpp"
 #include <algorithm>
 #include <cmath>
+#include <glm/glm.hpp>
 #include <tuple>
 
 namespace cg {
 
 class Triangle {
   int v1_id, v2_id, v3_id;
-  RenderData *render_data;
 
   static auto edge_function(int x1, int y1, int x2, int y2, int x, int y)
       -> int {
@@ -19,22 +19,22 @@ class Triangle {
 
   static auto barycentric(int x1, int y1, int x2, int y2, int x3, int y3, int x,
                           int y) -> std::tuple<float, float, float> {
-    float denom =
+    float area =
         static_cast<float>((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
 
-    if (denom == 0.0f)
+    if (area == 0.0f)
       return {0.0f, 0.0f, 0.0f};
 
     float w1_num =
         static_cast<float>((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3));
     float w2_num =
         static_cast<float>((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3));
-    float w3_num = denom - w1_num - w2_num;
+    float w3_num = area - w1_num - w2_num;
 
-    return {w1_num / denom, w2_num / denom, w3_num / denom};
+    return {w1_num / area, w2_num / area, w3_num / area};
   }
 
-  [[nodiscard]] auto interpolate_color(int x, int y) const -> Color {
+  [[nodiscard]] auto interpolate_color(int x, int y, RenderData*render_data) const -> Color {
     auto [x1, y1] = render_data->get_vertex(v1_id);
     auto [x2, y2] = render_data->get_vertex(v2_id);
     auto [x3, y3] = render_data->get_vertex(v3_id);
@@ -55,13 +55,11 @@ class Triangle {
   }
 
 public:
-  Triangle(int v1, int v2, int v3, RenderData *data)
-      : v1_id(v1), v2_id(v2), v3_id(v3), render_data(data) {
-    if (!data)
-      throw std::invalid_argument{"RenderData cannot be null"};
+  Triangle(int v1, int v2, int v3)
+      : v1_id(v1), v2_id(v2), v3_id(v3) {
   }
 
-  void render(Target &target) const {
+  void render(Target &target, RenderData* render_data) const {
     auto [v1_x, v1_y] = render_data->get_vertex(v1_id);
     auto [v2_x, v2_y] = render_data->get_vertex(v2_id);
     auto [v3_x, v3_y] = render_data->get_vertex(v3_id);
@@ -105,7 +103,7 @@ public:
                            (!v3v1_inside_is_positive && test_v3v1 <= 0);
 
         if (inside_v1v2 && inside_v2v3 && inside_v3v1) {
-          Color pixel_color = interpolate_color(x, y);
+          Color pixel_color = interpolate_color(x, y, render_data);
           // interpolate_color acts as the fragment shader here, i should
           // probably change it sometime, but it is what i was asked for this
           // class
