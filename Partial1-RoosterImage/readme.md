@@ -9,3 +9,5 @@ It is basically an image editor for the formats jpg and png, where we should be 
 
 
 As i am using JavaFX, i need another approach to editing the image because it is different from the buffered image we are used to 
+
+i use maven so for running you need it, open the terminal and run `mvn javafx:run` and voila
