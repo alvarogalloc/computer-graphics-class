@@ -1,0 +1,43 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{ragged2e}
+\usepackage{setspace}
+\usepackage{titlesec}
+
+\begin{document}
+
+
+% this is for the header 'grid', with left, center and right orientations
+\noindent
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l c r}
+\fontsize{9pt}{11pt}\selectfont \textbf{Multimedia \& Graphics Programming} &
+\fontsize{9pt}{11pt}\selectfont \textbf{0271987@up.edu.mx} &
+\fontsize{9pt}{11pt}\selectfont \textbf{Álvaro Gallo Cruz}
+\end{tabular*}
+
+\vspace{1.5em}
+
+\begin{center}
+\fontsize{20pt}{24pt}\selectfont
+\textbf{Tron movies were not only `good': the technical heritage of the pioneer in CGI}
+\end{center}
+
+\vspace{1.5em}
+
+\justifying
+\setstretch{1}
+
+Tron was the first feature film to extensively use digital images directly integrated into live-action. This was in 1982, where the technology at that time was not used and even laughed at. Tron took the risk to use the potential of computer for creative purposes. They created what we now call a \textit{virtual set}, integrating computer-generated backgrounds with live-action scenes shot using a complex backlit process. Disney collaborated with four companies: MAGI, Triple-I, Robert Abel \& Associates, and Digital Effects. Tron demonstrated that computer graphics could support a story, which later inspired Pixar to create \textit{Toy Story}.
+
+Production teams used different modeling systems to create 3D objects. MAGI used \textit{Synthavision}, which combined 24 geometric primitives to build vehicles like the light cycle and tanks. Triple-I used polygonal modeling, which is now the standard for modeling in programs like Maya or Blender. Rendering techniques included the first use of ray tracing for lighting by MAGI and Gouraud and Phong shading by Triple-I. Robert Abel \& Associates applied vector fill to simulate three-dimensional scans using line-based systems. Line-based algorithms were the best for those times, because they could be optimized to only use integer math, which operations were much more optimized than the floating-point counterparts, which were not even standardized until 1985 by the IEEE.
+
+The project established production workflows for modeling, rigging, and rendering. Filmmakers and computer scientists created a shared language, defining technical terms such as resolution and camera views. Companies developed methods to transfer digital data to the VistaVision film format. To improve efficiency, MAGI used a modem connection to send images between New York and Los Angeles for supervision. This was a highly privileged asset, as only a few universities and companies had access to the new communication protocols and infrastructure.
+
+Technicians computerized cameras to capture animation. The exposure control system regulated shutter speeds with a precision of one ten-thousandth of a second. The production also implemented early 3D tracking by using reference points on sets to replicate camera movements in digital backgrounds. These innovations shifted the industry from vector systems toward the digital workflows that dominate cinema today, even if we do not always perceive the computers behind them.
+
+What began as a risky collaboration between artists and engineers became proof that computation could be a cinematic instrument, not merely a scientific tool. If you see the movie today, it definitely seems outdated, but also visionary. It laid the conceptual and technical foundations for modern CGI, virtual production, and fully digital films. Even though audiences in 1982 could not yet foresee the revolution it started, Tron demonstrated that pixels could carry weight, atmosphere, and emotion into our lives, closing the boundary between physical and digital worlds. We got in.
+
+\end{document}
