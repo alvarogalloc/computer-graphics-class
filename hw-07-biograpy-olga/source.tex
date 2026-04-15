@@ -1,0 +1,38 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em}
+
+\begin{document}
+
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}c r}
+  {\footnotesize\textbf{Multimedia \& Graphics Programming}} &
+  {\footnotesize\textbf{0271987@up.edu.mx}} &
+  {\footnotesize\textbf{\'Alvaro Gallo Cruz}}
+\end{tabular*}
+
+\begin{center}
+  {\LARGE\textbf{Olga Sorkine-Hornung Biography}}
+\end{center}
+
+Dr. Olga Sorkine-Hornung is a pioneering computer scientist and Full Professor at ETH Zurich, where she leads the Interactive Geometry Lab. Over the past two decades, her research has fundamentally shaped the fields of computer graphics, geometric modeling, and geometry processing. Her work focuses on bridging the gap between complex mathematical foundations and intuitive, user-friendly digital content creation, empowering artists, software engineers, and researchers to manipulate 3D geometry seamlessly. 
+
+Sorkine-Hornung's most influential research centers on interactive shape deformation. In traditional 3D graphics, bending, twisting, or posing a digital object often resulted in severe polygon distortion, losing the fine details of the mesh. She addressed this through landmark CS research contributions:
+
+Sorkine-Hornung used differential coordinates (Laplacian coordinates) for mesh processing. Instead of treating a 3D model as a raw collection of absolute vertex positions, her algorithms encoded the local neighborhood of each vertex. When a user drags a part of the model, the algorithm preserves the high-frequency geometric details, resulting in smooth, natural deformations.
+
+Her most celebrated contribution, the ARAP framework revolutionized character animation and shape manipulation. The algorithm ensures that when a 3D mesh is deformed, its local transformations behave as rigidly as possible. This mimics real-world physics—minimizing unnatural stretching, shearing, or volume loss during a bend.
+
+In addition to theoretical breakthroughs, Sorkine-Hornung's lab developed \textit{libigl}, a widely adopted, header-only C++ geometry processing library. It consolidated decades of complex computer graphics algorithms into accessible, robust programming interfaces for the developer community.
+
+The algorithms pioneered by Sorkine-Hornung have gone from academic research into industry-standard multimedia software and tools used worldwide today:
+\begin{itemize}
+    \item \textbf{3D Animation:} The ARAP algorithms and Laplacian deformation techniques are integrated into the character pipelines of standard 3D software like Maya, Blender, and game engines. They pose characters intuitively with simple "click-and-drag" mechanics without breaking the model.
+    \item \textbf{Digital Fabrication \& CAD:} Her geometry processing research is heavily utilized in 3D printing and architectural design.
+\end{itemize}
+
+She is the backbone of Hollywood big money made on the animation boom of the 2000-2010s by being a nerd, a great nerd.
+\end{document}
