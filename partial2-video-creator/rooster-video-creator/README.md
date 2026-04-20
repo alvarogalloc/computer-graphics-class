@@ -21,15 +21,7 @@ flowchart LR
 
 ## Architecture & Design Decisions
 
-- **One-way data movement only:** Ingest -> Extract Metadata -> Derive Timeline -> Generate Assets -> Compose Final Video. State passes linearly between discrete services, effectively eliminating race conditions and avoiding cyclic dependencies.
-- **Service Interfaces:** All external APIs limit dependencies by using uniform internal service interfaces (`AiService`, `FFmpegService`, `MapService`, `MetadataService`). This makes mocking integrations for tests simple, or outright replacing FFmpeg CLI with native JNI (e.g. wrapper code) trivial. State passes gracefully to downstream calls without explicit tight coupling.
-- **Pipeline Abstraction:** The `PipelineStep` interfaces form a strict series of execution tasks. Each step owns exactly one single responsibility constraint representing chronological output generation via processing logic isolated to its class structure. `VideoPipelineOrchestrator` runs them sequentially reporting real-time listener updates enabling seamless UI and CLI observability.
-- **Tools Override Custom Solutions:** Heavy lifting is delegated to proven standalone tools inside service wrappers (ExifTool / Mapbox / FFmpeg) rather than writing custom unstable media parsers or rendering libraries.
-- **Resource Cleanup / Error Recovery:** The system is explicitly designed for short-lived ephemeral process commands checking states incrementally vs. large continuous system threads.
-
-## Pipeline Stages Overview
-
-The pipeline operates sequentially in five automated stages. First, it extracts geographical metadata from the media sequence and generates an AI "essence" prompt capturing the starting location's mood. Second, it generates chronological text-to-speech narrations providing a sentence for each localized point. Third, it loops and resizes the static media into portrait clips perfectly bounded to the duration of the corresponding narration chunks. Fourth, it merges these clips into a single unified timeline and applies broadcast-grade audio loudness normalization. Finally, it creates a closing map sequence bridging the journey's start and end points, over which a personalized AI-generated inspirational phrase is drawn, appending it to the final narrated video output.
+The application manages a strictly linear, one-way pipeline prioritizing observability and separation of concerns. It delegates heavy lifting entirely to proven external tools (ExifTool, FFmpeg, Gemini, Mapbox) encapsulated behind uniform interfaces. Processing occurs across five isolated steps: extracting metadata alongside AI prompt generation, producing per-scene TTS narrations, assembling visual portrait clips synced to that audio, mastering audio loudness norms, and appending an AI-quoted closing map sequence.
 
 ## Recommended tools for this exact project
 
