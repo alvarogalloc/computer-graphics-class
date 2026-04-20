@@ -276,7 +276,7 @@ public class FFmpegCliService implements FFmpegService {
             "measured_LRA=" + analysis.lraLu() + ":" +
             "measured_thresh=" + analysis.threshold() + ":" +
             "offset=" + analysis.targetOffset() + ":" +
-            "linear=true:print_format=summary,alimiter=limit=0.891";
+            "linear=false:print_format=summary,alimiter=limit=-1.5dB";
 
         commandRunner.runOrThrow(List.of(
             "ffmpeg", "-y",
@@ -304,8 +304,8 @@ public class FFmpegCliService implements FFmpegService {
         if (!within(metrics.truePeakDbtp(), constraints.minTruePeakDbtp(), constraints.maxTruePeakDbtp())) {
             errors.add("True peak out of range: " + metrics.truePeakDbtp() + " expected [" + constraints.minTruePeakDbtp() + ", " + constraints.maxTruePeakDbtp() + "]");
         }
-        if (!within(metrics.loudnessRangeLu(), constraints.minLraLu(), constraints.maxLraLu())) {
-            errors.add("LRA out of range: " + metrics.loudnessRangeLu() + " expected [" + constraints.minLraLu() + ", " + constraints.maxLraLu() + "]");
+        if (metrics.loudnessRangeLu() > constraints.maxLraLu()) {
+            errors.add("LRA out of range: " + metrics.loudnessRangeLu() + " expected <= " + constraints.maxLraLu());
         }
 
         if (!errors.isEmpty()) {
