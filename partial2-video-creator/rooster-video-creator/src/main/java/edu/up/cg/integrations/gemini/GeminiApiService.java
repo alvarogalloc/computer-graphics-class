@@ -1,14 +1,21 @@
 package edu.up.cg.integrations.gemini;
 
-import edu.up.cg.health.ServiceHealth;
+import edu.up.cg.integrations.ai.AIService;
+import edu.up.cg.integrations.ai.AiTask;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class GeminiApiService implements GeminiService {
+public class GeminiApiService extends AIService {
+    // Upgraded to pro tier as requested.
+    private static final String MODEL_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=";
+    private static final Pattern TEXT_PATTERN = Pattern.compile("\\\"text\\\"\\s*:\\s*\\\"(.*?)\\\"", Pattern.DOTALL);
+
     private final String apiKey;
     private final HttpClient httpClient;
 
@@ -22,13 +29,31 @@ public class GeminiApiService implements GeminiService {
     }
 
     @Override
-    public ServiceHealth healthCheck() {
+    public String generateEssenceImagePrompt(String mediaSummary) {
+        return generateFromTask(AiTask.ESSENCE_IMAGE_PROMPT, mediaSummary);
+    }
+
+    @Override
+    public String generateNarrationScript(String timelineSummary) {
+        return generateFromTask(AiTask.NARRATION_SCRIPT, timelineSummary);
+    }
+
+    @Override
+    public String generateInspirationalPhrase(String placesSummary) {
+        return generateFromTask(AiTask.INSPIRATIONAL_PHRASE, placesSummary);
+    }
+
+    private String generateFromTask(AiTask task, String context) {
+        return callGemini(task.promptPrefix() + context);
+    }
+
+    private String callGemini(String prompt) {
         if (apiKey == null || apiKey.isBlank()) {
-            return ServiceHealth.unhealthy("Gemini", "GEMINI_API_KEY is missing");
+            throw new IllegalStateException("GEMINI_API_KEY is missing");
         }
 
-        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=" + apiKey;
-        String body = "{\"contents\":[{\"parts\":[{\"text\":\"Respond with OK\"}]}]}";
+        String endpoint = MODEL_ENDPOINT + apiKey;
+        String body = "{\"contents\":[{\"parts\":[{\"text\":\"" + escapeJson(prompt) + "\"}]}]}";
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(endpoint))
@@ -38,16 +63,45 @@ public class GeminiApiService implements GeminiService {
 
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200 && response.body().contains("candidates")) {
-                return ServiceHealth.healthy("Gemini", "Gemini API responded correctly");
+            if (response.statusCode() != 200) {
+                throw new IllegalStateException("Gemini HTTP " + response.statusCode() + ": " + summarize(response.body()));
             }
-            return ServiceHealth.unhealthy("Gemini", "HTTP " + response.statusCode() + ": " + summarize(response.body()));
+
+            String text = extractText(response.body());
+            if (text.isBlank()) {
+                throw new IllegalStateException("Gemini response did not include candidate text");
+            }
+            return text;
         } catch (IOException e) {
-            return ServiceHealth.unhealthy("Gemini", "I/O error while calling Gemini API: " + e.getMessage());
+            throw new IllegalStateException("I/O error while calling Gemini API: " + e.getMessage(), e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return ServiceHealth.unhealthy("Gemini", "Health check interrupted");
+            throw new IllegalStateException("Gemini request interrupted", e);
         }
+    }
+
+    private String extractText(String body) {
+        Matcher matcher = TEXT_PATTERN.matcher(body);
+        if (!matcher.find()) {
+            return "";
+        }
+        return unescapeJson(matcher.group(1)).trim();
+    }
+
+    private String escapeJson(String text) {
+        return text
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r");
+    }
+
+    private String unescapeJson(String text) {
+        return text
+            .replace("\\n", "\n")
+            .replace("\\r", "\r")
+            .replace("\\\"", "\"")
+            .replace("\\\\", "\\");
     }
 
     private String summarize(String text) {

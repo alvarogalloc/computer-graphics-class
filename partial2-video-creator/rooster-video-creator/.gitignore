@@ -1,1 +1,5 @@
-.env.prod
+.env.*
+output*/
+bin/
+lib/
+target/

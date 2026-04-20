@@ -27,34 +27,9 @@ flowchart LR
 - **Tools Override Custom Solutions:** Heavy lifting is delegated to proven standalone tools inside service wrappers (ExifTool / Mapbox / FFmpeg) rather than writing custom unstable media parsers or rendering libraries.
 - **Resource Cleanup / Error Recovery:** The system is explicitly designed for short-lived ephemeral process commands checking states incrementally vs. large continuous system threads.
 
-## Pipeline Stages Definition
+## Pipeline Stages Overview
 
-The project is structured under `edu.up.cg.pipeline` utilizing dedicated step classes that independently interact with the `PipelineContext` state:
-
-### Step 01: Essence Image (`Step01EssenceImage`)
-* **Receives:** Ordered media metadata wrapped via context state.
-* **Does:** Evaluates the earliest geographical points and runs an AI prompt outlining the essence of the starting location.
-* **Outputs:** Generates an evocative image-based vision prompt string (`01_essence_prompt.txt`) appended to pipeline context.
-
-### Step 02: Narration & TTS Generation (`Step02NarrationTts`)
-* **Receives:** Ordered points list containing dates, geo-coordinates, and context.
-* **Does:** Prompts AI to construct chronologically tied phrasing mapping one sentence per coordinate. Invokes Google TTS stream creation.
-* **Outputs:** A complete text script and multiple synchronized TTS voiceover files `.mp3` linked back to the step instance context.
-
-### Step 03: Visual Timeline Creation (`Step03VisualTimeline`)
-* **Receives:** Raw photos/videos alongside lengths defined via bounded audio `.mp3` sizes per scene.
-* **Does:** Pre-renders all incoming media explicitly scaling/cropping padding into strict portrait aspect format via FFmpeg while looping their runtime (`-shortest`) precisely to map lengths of narrator voice track fragments.
-* **Outputs:** Chronological and aligned visual & voice timeline clips merged into an uncompressed AV track called `03_timeline.mp4`.
-
-### Step 04: Final Merge and Normalization (`Step04FinalMerge`)
-* **Receives:** The unified timeline video (`03_timeline.mp4`).
-* **Does:** Seamlessly copies encoding formats whilst injecting broadcast-level audio normalization metrics (`-af loudnorm` filter graph) into the video's embedded track. Validates compliance variables (LRA/TruePeak).
-* **Outputs:** The complete loudness-normalized track `04_merged.mp4`.
-
-### Step 05: Map Outro & Wrap-up (`Step05MapOutro`)
-* **Receives:** `04_merged.mp4` timeline track and first/last detected geo-coordinates.
-* **Does:** Asks Mapbox static layout endpoints for an overarching bounds map bridging the first & last detected positions. Queries AI for an inspirational close-out wrap phrase. Encodes the text directly drawn over the resulting map explicitly using stacked `drawtext` video filters.
-* **Outputs:** Joins the prior normalized clip dynamically combining visuals for the final full-chain production `05_final_video.mp4`.
+The pipeline operates sequentially in five automated stages. First, it extracts geographical metadata from the media sequence and generates an AI "essence" prompt capturing the starting location's mood. Second, it generates chronological text-to-speech narrations providing a sentence for each localized point. Third, it loops and resizes the static media into portrait clips perfectly bounded to the duration of the corresponding narration chunks. Fourth, it merges these clips into a single unified timeline and applies broadcast-grade audio loudness normalization. Finally, it creates a closing map sequence bridging the journey's start and end points, over which a personalized AI-generated inspirational phrase is drawn, appending it to the final narrated video output.
 
 ## Recommended tools for this exact project
 

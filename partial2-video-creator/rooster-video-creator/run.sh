@@ -1,1 +1,0 @@
-mvn -q -DskipTests compile exec:java -Dexec.mainClass=edu.up.cg.Main

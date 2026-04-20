@@ -1,49 +1,85 @@
 package edu.up.cg.integrations.map;
 
-import edu.up.cg.health.ServiceHealth;
+import edu.up.cg.integrations.metadata.GeoPoint;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class MapboxOsmService implements MapService {
     private final String accessToken;
     private final HttpClient httpClient;
+    private final MapStyle style;
 
     public MapboxOsmService() {
-        this(System.getenv("MAPBOX_ACCESS_TOKEN"), HttpClient.newHttpClient());
+        this(System.getenv("MAPBOX_ACCESS_TOKEN"), HttpClient.newHttpClient(), MapStyle.STREETS);
     }
 
     public MapboxOsmService(String accessToken, HttpClient httpClient) {
+        this(accessToken, httpClient, MapStyle.STREETS);
+    }
+
+    public MapboxOsmService(String accessToken, HttpClient httpClient, MapStyle style) {
         this.accessToken = accessToken;
         this.httpClient = httpClient;
+        this.style = style;
     }
 
     @Override
-    public ServiceHealth healthCheck() {
-        if (accessToken == null || accessToken.isBlank()) {
-            return ServiceHealth.unhealthy("Mapbox OSM", "MAPBOX_ACCESS_TOKEN is missing");
-        }
+    public URI buildStaticMapUrl(GeoPoint firstLocation, GeoPoint lastLocation, int width, int height) {
+        requireAccessToken();
+        validateSize(width, height);
+        String firstMarker = "pin-s-a+00a86b(%s,%s)".formatted(firstLocation.getLongitude(), firstLocation.getLatitude());
+        String lastMarker = "pin-s-b+e63946(%s,%s)".formatted(lastLocation.getLongitude(), lastLocation.getLatitude());
 
-        String endpoint = "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/0,0,1/100x100?access_token=" + accessToken;
+        return URI.create(
+            "https://api.mapbox.com/styles/v1/%s/static/%s,%s/auto/%sx%s?padding=60&access_token=%s"
+                .formatted(style.value(), firstMarker, lastMarker, width, height, encode(accessToken))
+        );
+    }
+
+    @Override
+    public void downloadStaticMap(GeoPoint firstLocation, GeoPoint lastLocation, int width, int height, Path outputFile) {
+        URI mapUri = buildStaticMapUrl(firstLocation, lastLocation, width, height);
+
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(endpoint))
+            .uri(mapUri)
             .GET()
             .build();
 
         try {
             HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
-            if (response.statusCode() == 200 && response.body().length > 0) {
-                return ServiceHealth.healthy("Mapbox OSM", "Mapbox static map endpoint is reachable");
+            if (response.statusCode() != 200 || response.body().length == 0) {
+                throw new IllegalStateException("Mapbox request failed with HTTP " + response.statusCode());
             }
-            return ServiceHealth.unhealthy("Mapbox OSM", "HTTP " + response.statusCode());
+            Files.write(outputFile, response.body());
         } catch (IOException e) {
-            return ServiceHealth.unhealthy("Mapbox OSM", "I/O error while calling Mapbox API: " + e.getMessage());
+            throw new IllegalStateException("Failed to download static map: " + e.getMessage(), e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return ServiceHealth.unhealthy("Mapbox OSM", "Health check interrupted");
+            throw new IllegalStateException("Mapbox request interrupted", e);
         }
+    }
+
+    private void validateSize(int width, int height) {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("width and height must be positive");
+        }
+    }
+
+    private void requireAccessToken() {
+        if (accessToken == null || accessToken.isBlank()) {
+            throw new IllegalStateException("MAPBOX_ACCESS_TOKEN is missing");
+        }
+    }
+
+    private String encode(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 }
