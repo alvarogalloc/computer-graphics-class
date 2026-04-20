@@ -35,12 +35,12 @@ public class MapboxOsmService implements MapService {
     public URI buildStaticMapUrl(GeoPoint firstLocation, GeoPoint lastLocation, int width, int height) {
         requireAccessToken();
         validateSize(width, height);
-        String firstMarker = "pin-s-a+00a86b(%s,%s)".formatted(firstLocation.getLongitude(), firstLocation.getLatitude());
-        String lastMarker = "pin-s-b+e63946(%s,%s)".formatted(lastLocation.getLongitude(), lastLocation.getLatitude());
+        String firstMarker = String.format("pin-s-a+00a86b(%s,%s)", firstLocation.getLongitude(), firstLocation.getLatitude());
+        String lastMarker = String.format("pin-s-b+e63946(%s,%s)", lastLocation.getLongitude(), lastLocation.getLatitude());
 
         return URI.create(
-            "https://api.mapbox.com/styles/v1/%s/static/%s,%s/auto/%sx%s?padding=60&access_token=%s"
-                .formatted(style.value(), firstMarker, lastMarker, width, height, encode(accessToken))
+            String.format("https://api.mapbox.com/styles/v1/%s/static/%s,%s/auto/%sx%s?padding=60&access_token=%s",
+                style.value(), firstMarker, lastMarker, width, height, encode(accessToken))
         );
     }
 
