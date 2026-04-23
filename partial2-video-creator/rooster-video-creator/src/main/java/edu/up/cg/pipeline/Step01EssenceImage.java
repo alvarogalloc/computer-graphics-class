@@ -50,7 +50,11 @@ public class Step01EssenceImage implements PipelineStep {
             Files.writeString(promptFile, generatedPrompt, StandardCharsets.UTF_8);
             context.getState().setEssencePromptFile(promptFile);
 
-            String details = "Generated essence prompt and wrote file: " + promptFile;
+            Path imageFile = context.getOutputDirectory().resolve("01_essence_image.jpeg");
+            context.getAiService().generateImage(generatedPrompt, imageFile);
+            context.getState().setEssenceImageFile(imageFile);
+
+            String details = "Generated essence prompt and image to: " + imageFile;
             return new StepExecutionResult(getStage(), getStepName(), true, details);
         } catch (Exception e) {
             return new StepExecutionResult(getStage(), getStepName(), false, "Step failed: " + e.getMessage());

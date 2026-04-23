@@ -2,7 +2,7 @@ package edu.up.cg.integrations.ai;
 
 public enum AiTask {
     ESSENCE_IMAGE_PROMPT(
-        "Create one concise image-generation prompt that captures the visual essence of the media collection. " +
+        "Create one highly descriptive, photorealistic, cinematic image-generation prompt that captures the visual essence of the media collection. " +
             "No markdown, no bullets. Context: "
     ),
     NARRATION_SCRIPT(

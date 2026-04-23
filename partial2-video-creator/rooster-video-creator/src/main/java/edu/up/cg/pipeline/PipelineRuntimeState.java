@@ -10,6 +10,7 @@ public final class PipelineRuntimeState {
     private final List<MediaMetadata> orderedMediaMetadata;
     private String essencePrompt;
     private Path essencePromptFile;
+    private Path essenceImageFile;
     private Path timelineVideoFile;
     private String narrationScript;
     private Path narrationScriptFile;
@@ -44,6 +45,14 @@ public final class PipelineRuntimeState {
 
     public void setEssencePromptFile(Path essencePromptFile) {
         this.essencePromptFile = essencePromptFile;
+    }
+
+    public Path getEssenceImageFile() {
+        return essenceImageFile;
+    }
+
+    public void setEssenceImageFile(Path essenceImageFile) {
+        this.essenceImageFile = essenceImageFile;
     }
 
     public Path getTimelineVideoFile() {
