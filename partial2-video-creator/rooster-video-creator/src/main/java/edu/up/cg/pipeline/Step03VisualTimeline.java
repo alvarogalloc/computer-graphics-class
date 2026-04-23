@@ -88,7 +88,6 @@ public class Step03VisualTimeline implements PipelineStep {
                     }
                 } else {
                     // For video files, we'd normally just convert to portrait.
-                    // But if we want narration we should mix it. Right now we don't have a specific requirement to overwrite video audio, so just scale it.
                     context.getFfmpegService().convertToPortraitCover(
                         metadata.getSourcePath(),
                         clipFile,
